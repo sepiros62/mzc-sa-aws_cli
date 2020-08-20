@@ -1,0 +1,29 @@
+---
+- name: Create and set permissions to ".aws" folder
+  file:
+    path: "{{ awscliconf_full_path }}"
+    state: directory
+    recurse: "{{ awscliconf_recursive_path }}"
+    mode: "{{ awscliconf_folder_permission }}"
+    owner: "{{ awscliconf_files_owner }}"
+    group: "{{ awscliconf_files_group }}"
+  tags:
+    - configure
+
+- name: Deploy "credentials" file using template
+  template:
+    src: aws/credentials.j2
+    dest: "{{ awscliconf_credentials_file_path }}"
+    mode: "{{ awscliconf_credentials_permission }}"
+    owner: "{{ awscliconf_files_owner }}"
+    group: "{{ awscliconf_files_group }}"
+    force: true
+
+- name: Deploy "config" file using template
+  template:
+    src: aws/config.j2
+    dest: "{{ awscliconf_config_file_path }}"
+    mode: "{{ awscliconf_config_permission }}"
+    owner: "{{ awscliconf_files_owner }}"
+    group: "{{ awscliconf_files_group }}"
+    force: true

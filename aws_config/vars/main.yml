@@ -1,0 +1,35 @@
+---
+# Name and permission for config file
+awscliconf_config_file: "config"
+awscliconf_config_permission: 0600
+
+# Name and permission for credentials file
+awscliconf_credentials_file: "credentials"
+awscliconf_credentials_permission: 0600
+
+# AWS CLI folder name and permission, it wil be created inside the path defined in: awscliconf_path var
+awscliconf_folder: ".aws"
+awscliconf_folder_permission: 0775
+
+# Internal "paths" variables
+awscliconf_full_path: "{{ awscliconf_path }}/{{ awscliconf_folder }}"
+awscliconf_config_file_path: "{{ awscliconf_full_path }}/{{ awscliconf_config_file }}"
+awscliconf_credentials_file_path: "{{ awscliconf_full_path }}/{{ awscliconf_credentials_file }}"
+
+# Define if the path creation will be recursive
+awscliconf_recursive_path: "{{ awscliconf_recursive_path_creation | bool }}"
+
+# Default values for aws cli files
+awscliconf_default_files:
+  config:
+    - default:
+        output: json
+
+  credentials:
+    - default:
+        aws_access_key_id: ''
+        aws_secret_access_key: ''
+
+# validate and split in different files
+awscliconf_valid_credentials_file: "{{ awscliconf_files['credentials']  if awscliconf_files['credentials'] is defined and awscliconf_files['credentials']|length > 0 else awscliconf_default_files['credentials'] }}"
+awscliconf_valid_config_file: "{{ awscliconf_files['config']  if awscliconf_files['config'] is defined and awscliconf_files['config']|length > 0 else awscliconf_default_files['config'] }}"

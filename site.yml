@@ -1,0 +1,50 @@
+---
+- name: 'AWS CLI Environment Configuration Playbook'
+  hosts: 'localhost'
+  gather_facts: true
+
+  vars:
+    - cli_package: 'awscli'
+    - ansible_python_interpreter: '/bin/python'
+
+  vars_prompt:
+    - name: "select"
+      prompt: |
+        !!! Choose the number for the task !!! 
+           [ 0 - ALL ]
+           [ 1 - EPEL-REPO Install ]
+           [ 2 - AWS CLI Install ]
+           [ 3 - AWS CLI Configure ]
+      private: false
+
+  roles:
+    - role: 'aws_repo'
+      tags: [ all, aws_repo ]
+      when: select == '0' or select == '1'
+
+    - role: 'aws_cli'
+      tags: [ all, aws_cli ]
+      when: select == '0' or select == '2'
+
+    - role: 'aws_config'
+      tags: [ all, aws_config ]
+      vars:
+        awscliconf_files:
+          credentials:
+            - default:
+                aws_access_key_id: ''
+                aws_secret_access_key: ''
+            - jaehwan:
+                aws_access_key_id: ''
+                aws_secret_access_key: ''
+          config:
+            - default:
+                region: ap-northeast-2
+                output: table
+            - jaehwan:
+                region: ap-northeast-2
+                output: json
+            - profile development:
+                region: ap-northeast-2
+                source_profile: default
+      when: select == '0' or select == '3'

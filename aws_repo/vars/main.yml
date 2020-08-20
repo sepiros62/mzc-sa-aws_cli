@@ -1,0 +1,6 @@
+---
+epel_package: "epel-release"
+epel_repo_file_path: "/etc/yum.repos.d/epel.repo"
+
+epel_global_downloads_retries: 5
+epel_global_downloads_delay: 2

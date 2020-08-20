@@ -1,0 +1,46 @@
+---
+# Define the path where AWS CLI ".aws"'s folder will be created.
+# NOTE: The folder ".aws" will be created by the role, do not add it to the path
+# By default this will be created in the $HOME path of the user who executes o become in ansible
+# possible values:
+# - https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html
+# default value: "~/."
+awscliconf_path: "~/."
+
+# If you use an "awscliconf_path" that doesn't exist in the target, you need to set
+# this variable to "true", in another case the execution will fail
+# NOTE: Unfortunately when you set this variable to "true", the role always sends "change" status.
+# possible values:
+# - true
+# - false
+# default value: false
+awscliconf_recursive_path_creation: false
+
+# The owner user for the folder ".aws" that will be created inside the path defined in "awscliconf_path"
+# possible values:
+# - https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html
+# default value: "root"
+awscliconf_files_owner: "root"
+
+# The owner group for the folder ".aws" that will be created inside the path defined in "awscliconf_path"
+# possible values:
+# - https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html
+# default value: "root"
+awscliconf_files_group: "root"
+
+# This variable define the content of the two AWS CLI configuration files
+# - .aws/config
+# - .aws/credentials
+# NOTE: If you don't set this variable, some default values will be sets
+# possible values:
+# - https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html
+# default values:
+#  config:
+#    - default:
+#        output: json
+#
+#  credentials:
+#    - default:
+#        aws_access_key_id: ''
+#        aws_secret_access_key: ''
+awscliconf_files: ""

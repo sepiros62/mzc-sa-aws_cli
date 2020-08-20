@@ -1,0 +1,14 @@
+---
+- name: Install "{{ cli_dependencies_packages }}" dependencies
+  dnf:
+    name: "{{ cli_dependencies_packages }}"
+    state: present
+  tags:
+    - install
+
+- name: Install {{ cli_package }}
+  pip:
+    name: "{{ cli_package }}"
+    state: present
+  tags:
+    - install

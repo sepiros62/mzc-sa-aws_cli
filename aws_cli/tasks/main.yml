@@ -1,0 +1,112 @@
+---
+# Include vars
+- name: Include variables for RedHat/CentOS
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_os_family|lower }}-{{ ansible_distribution_major_version }}.yml"
+    - "main.yml"
+  when: >
+    ansible_os_family == 'RedHat' and (
+      ansible_distribution == 'RedHat' or
+      ansible_distribution == 'CentOS'
+    )
+  tags:
+    - include-redhat-vars
+
+- name: Include variables for Debian Jessie
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution|lower }}-{{ ansible_distribution_major_version }}.yml"
+    - "main.yml"
+  when: >
+    ansible_os_family == 'Debian' and
+    ansible_distribution == 'Debian' and
+    ansible_distribution_major_version == '8'
+  tags:
+    - include-debian-8-vars
+
+- name: Include variables for Debian (not Jessie)
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution|lower }}.yml"
+    - "main.yml"
+  when: >
+    ansible_os_family == 'Debian' and
+    ansible_distribution == 'Debian' and not
+    ansible_distribution_major_version == '8'
+  tags:
+    - include-debian-vars
+
+- name: Include variables for Ubuntu
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution|lower }}.yml"
+    - "main.yml"
+  when: >
+    ansible_os_family == 'Debian' and
+    ansible_distribution == 'Ubuntu'
+  tags:
+    - include-ubuntu-vars
+
+# Include tasks
+- name: Include tasks for installation on RedHat/CentOS
+  include_tasks: "tasks/install-{{ ansible_os_family|lower }}-{{ ansible_distribution_major_version }}.yml"
+  when: >
+    ansible_os_family == 'RedHat' and (
+      ansible_distribution == 'CentOS' or
+      ansible_distribution == 'RedHat'
+    )
+  tags:
+    - include-redhat
+
+- name: Include tasks for installation on Ubuntu
+  include_tasks: "install-{{ ansible_distribution|lower }}.yml"
+  when: >
+    ansible_os_family == 'Debian' and ansible_distribution == 'Ubuntu'
+  tags:
+    - install-ubuntu
+
+- name: Include tasks for installation on Debian Jessie
+  include_tasks: "install-{{ ansible_distribution|lower }}-{{ ansible_distribution_major_version }}.yml"
+  when: >
+    ansible_os_family == 'Debian' and
+    ansible_distribution == 'Debian' and
+    ansible_distribution_major_version == '8'
+  tags:
+    - install-debian-8
+
+- name: Include tasks for installation on Debian (not Jessie)
+  include_tasks: "install-{{ ansible_distribution|lower }}.yml"
+  when: >
+    ansible_os_family == 'Debian' and
+    ansible_distribution == 'Debian' and not
+    ansible_distribution_major_version == '8'
+  tags:
+    - install-debian
+
+# setup command completion
+- name: echo shell
+  shell: 'which aws_completer'
+  args:
+    executable: '/bin/bash'
+  register: aws_completer_path_result
+  changed_when: false
+  tags:
+    - setup-aws-completer
+
+- name: test
+  lineinfile:
+    path: ~/.bashrc
+    regexp: "^complete"
+    line: "complete -C {{ aws_completer_path_result.stdout }} aws"
+  tags:
+    - setup-aws-completer
+
+- name:
+  shell: 'source ~/.bashrc'
+  args:
+    executable: '/bin/bash'
+  changed_when: false
+  tags:
+    - setup-aws-completer
+

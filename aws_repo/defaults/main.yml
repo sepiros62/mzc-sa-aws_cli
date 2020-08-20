@@ -1,0 +1,9 @@
+---
+# possible values:
+# - true
+# - false
+# default value: false
+# notes:
+# * apply only to Redhat 7/8, enable/disable extra repositories
+# Reference: https://fedoraproject.org/wiki/EPEL
+epel_enable_redhat_extras_repos: false

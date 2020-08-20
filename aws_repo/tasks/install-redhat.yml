@@ -1,0 +1,110 @@
+---
+- name: Check if EPEL repository exist
+  stat:
+    path: "{{ epel_repo_file_path }}"
+  register: epel_repo_file_path_result
+
+- name: Import EPEL repository GPG key
+  rpm_key:
+    key: "{{ epel_repo_gpg_key_url }}"
+    state: present
+  when: not epel_repo_file_path_result.stat.exists
+
+- name: Install EPEL repository RedHat/CentOS 6/7
+  yum:
+    name: "{{ epel_repo_url }}"
+    state: present
+  retries: "{{ epel_global_downloads_retries }}"
+  delay: "{{ epel_global_downloads_delay }}"
+  register: result
+  when: >
+    not epel_repo_file_path_result.stat.exists and
+    ansible_os_family == 'RedHat' and (
+      ansible_distribution == 'CentOS' or
+      ansible_distribution == 'RedHat'
+    ) and (
+      ansible_distribution_major_version == '7' or
+      ansible_distribution_major_version == '6'
+    )
+
+- name: Install EPEL repository RedHat/CentOS 8
+  dnf:
+    name: "{{ epel_repo_url }}"
+    state: present
+  retries: "{{ epel_global_downloads_retries }}"
+  delay: "{{ epel_global_downloads_delay }}"
+  register: result
+  when: >
+    not epel_repo_file_path_result.stat.exists and
+    ansible_os_family == 'RedHat' and (
+      ansible_distribution == 'CentOS' or
+      ansible_distribution == 'RedHat'
+    ) and
+    ansible_distribution_major_version == '8'
+
+- name: Install EPEL package RedHat/CentOS 6/7
+  yum:
+    name: "{{ epel_package }}"
+    state: present
+  retries: "{{ epel_global_downloads_retries }}"
+  delay: "{{ epel_global_downloads_delay }}"
+  when: >
+    not epel_repo_file_path_result.stat.exists and
+    ansible_os_family == 'RedHat' and (
+      ansible_distribution == 'CentOS' or
+      ansible_distribution == 'RedHat'
+    ) and (
+      ansible_distribution_major_version == '7' or
+      ansible_distribution_major_version == '6'
+    )
+
+- name: Install EPEL package RedHat/CentOS 8
+  dnf:
+    name: "{{ epel_package }}"
+    state: present
+  retries: "{{ epel_global_downloads_retries }}"
+  delay: "{{ epel_global_downloads_delay }}"
+  when: >
+    not epel_repo_file_path_result.stat.exists and
+    ansible_os_family == 'RedHat' and (
+      ansible_distribution == 'CentOS' or
+      ansible_distribution == 'RedHat'
+    ) and
+    ansible_distribution_major_version == '8'
+
+# Only for RedHat 7
+# reference: https://fedoraproject.org/wiki/EPEL
+- name: Enable the optional and extras repositories for RedHat 7
+  rhsm_repository:
+    name: "{{ item }}"
+    state: enabled
+  with_items:
+    - rhel-*-optional-rpms
+    - rhel-*-extras-rpms
+  when: >
+    ansible_os_family == 'RedHat' and
+    ansible_distribution == 'RedHat' and
+    ansible_distribution_major_version == '7' and
+    epel_enable_redhat_extras_repos
+
+# Only for RedHat 8
+# reference: https://fedoraproject.org/wiki/EPEL
+- name: Enable the optional and extras repositories for RedHat 8
+  rhsm_repository:
+    name: "{{ item }}"
+    state: enabled
+  with_items:
+    - codeready-builder-for-rhel-8-*-rpms
+  when: >
+    ansible_os_family == 'RedHat' and
+    ansible_distribution == 'RedHat' and
+    ansible_distribution_major_version == '8' and
+    epel_enable_redhat_extras_repos
+
+- name: Enable PowerTools repositories for RHEL 8
+  command: dnf config-manager --set-enabled PowerTools
+  when: >
+    ansible_os_family == 'RedHat' and
+    ansible_distribution == 'RedHat' and
+    ansible_distribution_major_version == '8' and
+    epel_enable_redhat_extras_repos

@@ -1,0 +1,17 @@
+# {{ ansible_managed }}
+{% for config_dict in awscliconf_valid_config_file | from_yaml %}
+{% for section, section_values in config_dict.items() %}
+[{{ section }}]
+{% for key, value  in section_values.items() %}
+{% if value is not mapping %}
+{{key}} = {{value}}
+{% else %}
+{{key}} =
+{% for sub_key, sub_value in value.items() %}
+  {{sub_key}} = {{sub_value}}
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+{% endfor %}
+{% endfor %}
