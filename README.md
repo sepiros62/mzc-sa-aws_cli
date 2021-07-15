@@ -206,7 +206,7 @@ localhost                  : ok=4    changed=0    unreachable=0    failed=0    s
 ```
 
 ## Final Result Check
-* AWS CLI 각 profile 별 동작 확인
+* AWS CLI 각 profile별 동작 확인
 ```bash
 [root@awx-server mzc-sa-tools]# aws s3 ls --profile jaehwan
 2020-06-10 04:11:13 b-abc-shop.cf
